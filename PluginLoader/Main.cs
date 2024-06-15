@@ -16,6 +16,8 @@ using avaness.PluginLoader.Network;
 using System.Runtime.ExceptionServices;
 using avaness.PluginLoader.Stats.Model;
 using avaness.PluginLoader.Config;
+using Sandbox;
+using System.Drawing;
 
 namespace avaness.PluginLoader
 {
@@ -28,7 +30,8 @@ namespace avaness.PluginLoader
         public PluginList List { get; }
         public PluginConfig Config { get; }
         public SplashScreen Splash { get; }
-        public PluginStats Stats {get; private set; }
+        public LoadingBarControl LoadingBar { get; private set; }
+        public PluginStats Stats { get; private set; }
 
         /// <summary>
         /// True if a local plugin was loaded
@@ -44,6 +47,7 @@ namespace avaness.PluginLoader
             Stopwatch sw = Stopwatch.StartNew();
 
             Splash = new SplashScreen();
+            LoadingBar = new LoadingBarControl(new Size(MySandboxGame.Config.ScreenWidth.Value, MySandboxGame.Config.ScreenHeight.Value));
 
             Instance = this;
 
@@ -232,12 +236,25 @@ namespace avaness.PluginLoader
         public void Init(object gameInstance)
         {
             LogFile.WriteLine($"Initializing {plugins.Count} plugins");
+
+            Application.OpenForms[0].Invoke(() => Application.OpenForms[0].Controls.Add(LoadingBar));
+
             for (int i = plugins.Count - 1; i >= 0; i--)
             {
                 PluginInstance p = plugins[i];
                 if (!p.Init(gameInstance))
                     plugins.RemoveAtFast(i);
+
+                LoadingBar.BarValue = (float)(plugins.Count - i) / (float)plugins.Count;
+                LoadingBar.Invalidate();
+                Application.DoEvents();
             }
+
+            Application.OpenForms[0].Invoke(() => Application.OpenForms[0].Controls.Remove(LoadingBar));
+            LoadingBar.Dispose();
+            Application.DoEvents();
+            LoadingBar = null;
+
             init = true;
         }
 

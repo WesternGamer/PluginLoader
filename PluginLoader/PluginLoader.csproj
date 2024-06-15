@@ -142,6 +142,9 @@
     <Compile Include="Data\ModPlugin.cs" />
     <Compile Include="GUI\AddPluginMenu.cs" />
     <Compile Include="GUI\GuiControls\ParentButton.cs" />
+    <Compile Include="GUI\LoadingBarControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="GUI\MainPluginMenu.cs" />
     <Compile Include="GUI\PluginDetailMenu.cs" />
     <Compile Include="GUI\PlayerConsent.cs" />
